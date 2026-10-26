@@ -80,7 +80,7 @@ done
 source_url="${SOURCE_URL:-}"
 if [[ -n "$source_url" ]] && command -v qrencode >/dev/null 2>&1; then
   [[ "$source_url" == */ ]] || source_url="$source_url/"
-  qrencode -t SVG -m 0 --foreground=1F232B -o "$site_dir/qr.svg" \
+  qrencode -t SVG --svg-path -m 0 --foreground=1F232B -o "$site_dir/qr.svg" \
     "irisin://repository/add?url=$source_url"
 fi
 if [[ -d depictions ]]; then
