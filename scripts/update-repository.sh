@@ -32,7 +32,7 @@ else
   : > "$work_dir/Packages"
 fi
 
-# Sileo files a package with no Section under nothing; refuse it here.
+# A package with no Section is filed under nothing; refuse it here.
 awk '
   BEGIN { RS = ""; FS = "\n" }
   {
@@ -42,7 +42,7 @@ awk '
       if ($field ~ /^Section: /) section = substr($field, 10)
     }
     if (package != "" && section == "") {
-      printf "Package %s has no Section field, which Sileo needs.\n", package > "/dev/stderr"
+      printf "Package %s has no Section field, which package managers file it by.\n", package > "/dev/stderr"
       exit 1
     }
   }
@@ -74,6 +74,15 @@ for file in index.html CydiaIcon.png sileo-featured.json; do
     cp "$file" "$site_dir/"
   fi
 done
+# The home page's QR code: Irisin's add-source link for the address
+# Pages serves, which the Camera opens in Irisin. Left out without
+# qrencode or an address, and the page shows the card without it.
+source_url="${SOURCE_URL:-}"
+if [[ -n "$source_url" ]] && command -v qrencode >/dev/null 2>&1; then
+  [[ "$source_url" == */ ]] || source_url="$source_url/"
+  qrencode -t SVG -m 0 --foreground=1F232B -o "$site_dir/qr.svg" \
+    "irisin://repository/add?url=$source_url"
+fi
 if [[ -d depictions ]]; then
   cp -R depictions "$site_dir/depictions"
 fi

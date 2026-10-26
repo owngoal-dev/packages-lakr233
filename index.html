@@ -5,56 +5,51 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>owngoal-dev/packages-lakr233</title>
 <style>
-:root { color-scheme: light dark; --muted: #6e6e73; --line: rgba(127, 127, 127, 0.25); }
-body { margin: 0; font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif; }
-main { max-width: 640px; margin: 0 auto; padding: 32px 16px 48px; }
-h1 { font-size: 28px; margin: 0 0 4px; }
-p { margin: 0 0 16px; color: var(--muted); }
-code { display: block; padding: 12px; border: 1px solid var(--line); border-radius: 10px; word-break: break-all; }
-.actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 32px; }
-.actions a { padding: 8px 14px; border-radius: 999px; background: #0a84ff; color: #fff; text-decoration: none; }
-li { list-style: none; padding: 12px 0; border-bottom: 1px solid var(--line); }
-ul { padding: 0; }
-li span { color: var(--muted); }
+:root { color-scheme: light; --ink: #1f232b; --page: #f2f2f7; }
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0; padding: 24px; background: var(--page); color: var(--ink);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+  font: 17px/22px ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+.card {
+  position: relative; width: min(400px, 100%); padding: 65px 32px 36px;
+  background: #fff; border-radius: 24px; text-align: center;
+}
+.card::before {
+  content: ""; position: absolute; top: 20px; left: 50%; width: 60px; height: 11px;
+  margin-left: -30px; border-radius: 5.5px; background: var(--page);
+}
+.card img.icon { display: block; width: 64px; height: 64px; margin: 0 auto 16px; border-radius: 15px; }
+.card p { margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card .title { font-weight: 700; margin-bottom: 3px; }
+.card .dim { opacity: 0.5; }
+.card img.qr { display: block; width: 248px; max-width: 100%; margin: 18px auto 30px; }
+a.open { color: #007aff; text-decoration: underline; }
 </style>
 </head>
 <body>
-<main>
-<h1>owngoal-dev/packages-lakr233</h1>
-<p>Add this source to your package manager:</p>
-<code id="source"></code>
-<div class="actions">
-<a id="sileo">Add to Sileo</a>
-<a id="zebra">Add to Zebra</a>
-</div>
-<ul id="packages"></ul>
+<main class="card">
+<img class="icon" src="CydiaIcon.png" alt="">
+<p class="title" id="title"></p>
+<p class="dim" id="address"></p>
+<img class="qr" id="qr" src="qr.svg" alt="">
+<p class="dim">Scan with Camera to add in Irisin</p>
+<p class="dim" id="owner"></p>
 </main>
+<a class="open" id="open">Open in Irisin…</a>
 <script>
+const repository = "owngoal-dev/packages-lakr233";
 const source = new URL(".", location.href).href;
-document.getElementById("source").textContent = source;
-document.getElementById("sileo").href = "sileo://source/" + source;
-document.getElementById("zebra").href = "zbra://sources/add/" + source;
-fetch("Packages").then(response => response.ok ? response.text() : "").then(text => {
-  const newest = new Map();
-  for (const block of text.split(/\n\n+/)) {
-    const fields = {};
-    for (const line of block.split("\n")) {
-      const match = /^([A-Za-z-]+): (.*)$/.exec(line);
-      if (match) fields[match[1]] = match[2];
-    }
-    if (fields.Package) newest.set(fields.Package, fields);
-  }
-  const list = document.getElementById("packages");
-  for (const fields of newest.values()) {
-    const item = document.createElement("li");
-    const name = document.createElement("strong");
-    name.textContent = (fields.Name || fields.Package) + " " + (fields.Version || "");
-    const description = document.createElement("span");
-    description.textContent = fields.Description ? " — " + fields.Description : "";
-    item.append(name, description);
-    list.append(item);
-  }
-});
+const [owner, name] = repository.split("/");
+document.getElementById("title").textContent = name || repository;
+document.getElementById("address").textContent = source.replace(/^https?:[/][/]/, "").replace(/[/]+$/, "");
+document.getElementById("owner").textContent = "@" + owner;
+document.getElementById("open").href = "irisin://repository/add?url=" + encodeURIComponent(source);
+for (const image of document.querySelectorAll("img")) {
+  image.addEventListener("error", () => { image.style.display = "none"; });
+}
 </script>
 </body>
 </html>
