@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>owngoal-dev/packages-lakr233</title>
+<style>
+:root { color-scheme: light dark; --muted: #6e6e73; --line: rgba(127, 127, 127, 0.25); }
+body { margin: 0; font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif; }
+main { max-width: 640px; margin: 0 auto; padding: 32px 16px 48px; }
+h1 { font-size: 28px; margin: 0 0 4px; }
+p { margin: 0 0 16px; color: var(--muted); }
+code { display: block; padding: 12px; border: 1px solid var(--line); border-radius: 10px; word-break: break-all; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 32px; }
+.actions a { padding: 8px 14px; border-radius: 999px; background: #0a84ff; color: #fff; text-decoration: none; }
+li { list-style: none; padding: 12px 0; border-bottom: 1px solid var(--line); }
+ul { padding: 0; }
+li span { color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+<h1>owngoal-dev/packages-lakr233</h1>
+<p>Add this source to your package manager:</p>
+<code id="source"></code>
+<div class="actions">
+<a id="sileo">Add to Sileo</a>
+<a id="zebra">Add to Zebra</a>
+</div>
+<ul id="packages"></ul>
+</main>
+<script>
+const source = new URL(".", location.href).href;
+document.getElementById("source").textContent = source;
+document.getElementById("sileo").href = "sileo://source/" + source;
+document.getElementById("zebra").href = "zbra://sources/add/" + source;
+fetch("Packages").then(response => response.ok ? response.text() : "").then(text => {
+  const newest = new Map();
+  for (const block of text.split(/\n\n+/)) {
+    const fields = {};
+    for (const line of block.split("\n")) {
+      const match = /^([A-Za-z-]+): (.*)$/.exec(line);
+      if (match) fields[match[1]] = match[2];
+    }
+    if (fields.Package) newest.set(fields.Package, fields);
+  }
+  const list = document.getElementById("packages");
+  for (const fields of newest.values()) {
+    const item = document.createElement("li");
+    const name = document.createElement("strong");
+    name.textContent = (fields.Name || fields.Package) + " " + (fields.Version || "");
+    const description = document.createElement("span");
+    description.textContent = fields.Description ? " — " + fields.Description : "";
+    item.append(name, description);
+    list.append(item);
+  }
+});
+</script>
+</body>
+</html>
